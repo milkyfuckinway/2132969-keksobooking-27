@@ -15,12 +15,12 @@ const PHOTOS = ['https://assets.htmlacademy.ru/content/intensive/javascript-1/ke
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg'
 ];
 
-const mockTest = () => {
+const mockTest = (_, index) => {
   const LAT = randomNumberWithComma(35.65000, 35.70000, 5);
   const LNG = randomNumberWithComma(139.70000, 139.80000, 5);
   return ({
     author: {
-      avatar: `img/avatars/user${formatNumber(randomNumber(1, 10))}.png`
+      avatar: `img/avatars/user${formatNumber(index + 1)}.png`
     },
     offer: {
       title: TITLES[randomNumber(0, TITLES.length - 1)],
