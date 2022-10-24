@@ -1,6 +1,2 @@
-import {
-  createRandomArray
-} from './data.js';
-
-createRandomArray();
+import './card.js';
 
