@@ -14,3 +14,4 @@ const disablerToggler = () => {
 };
 
 disablerToggler();
+disablerToggler();
