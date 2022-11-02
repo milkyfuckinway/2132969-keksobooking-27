@@ -13,6 +13,8 @@ const adFormCapacity = adForm.querySelector('#capacity');
 const adFormType = adForm.querySelector('#type');
 const adFormTitle = adForm.querySelector('#title');
 const adFormPrice = adForm.querySelector('#price');
+const adFormTimeIn = adForm.querySelector('#timein');
+const adFormTimeOut = adForm.querySelector('#timeout');
 
 const onTypeChange = () => {
   pristine.validate (adFormPrice);
@@ -34,10 +36,22 @@ const onRoomNumberChange = () => {
   pristine.validate(adFormRoomNumber);
 };
 
+const onTimeInChange = () => {
+  // pristine.validate(adFormTimeIn);
+  pristine.validate(adFormTimeOut);
+};
+
+const onTimeOutChange = () => {
+  pristine.validate(adFormTimeIn);
+  pristine.validate(adFormTimeOut);
+};
+
 adFormPrice.addEventListener('input', onTypeChange);
 adFormType.addEventListener('change', onPriceChange);
 adFormCapacity.addEventListener('change', onCapacityChange);
 adFormRoomNumber.addEventListener('change', onRoomNumberChange);
+adFormTimeIn.addEventListener('change', onTimeInChange);
+adFormTimeOut.addEventListener('change', onTimeOutChange);
 
 const validateIsNotEmpty = (value) => value;
 pristine.addValidator(adFormTitle, validateIsNotEmpty, 'Поле обязательно для заполнения');
@@ -80,6 +94,27 @@ const roomsToGuests = {
 const validateCapacity = () => roomsToGuests[adFormRoomNumber.value].includes(adFormCapacity.value);
 
 pristine.addValidator(adFormCapacity, validateCapacity, 'Недопустимое количество комнат');
+
+const timeInEqualsTimeOut = () => {
+  if (adFormTimeIn.value !== adFormTimeOut.value) {
+    adFormTimeIn.value = adFormTimeOut.value;
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const timeOutEqualsTimeIn = () => {
+  if (adFormTimeOut.value !== adFormTimeIn.value) {
+    adFormTimeOut.value = adFormTimeIn.value;
+    return false;
+  } else {
+    return true;
+  }
+};
+
+pristine.addValidator(adFormTimeOut, timeInEqualsTimeOut);
+pristine.addValidator(adFormTimeIn, timeOutEqualsTimeIn);
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
