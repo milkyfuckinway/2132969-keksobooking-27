@@ -7,7 +7,7 @@ import { randomNumber } from './math.js';
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 const canvasElement = document.querySelector('#map-canvas');
 
-const typesEngToRus = {
+export const typesEngToRus = {
   flat: 'Квартира',
   bungalow: 'Бунгало',
   house: 'Дом',
