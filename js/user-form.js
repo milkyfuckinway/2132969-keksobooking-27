@@ -1,6 +1,3 @@
-import {
-  typesEngToRus
-} from './card.js';
 /* eslint-disable no-console */
 const adForm = document.querySelector('.ad-form');
 const defaultConfig = {
@@ -10,26 +7,49 @@ const defaultConfig = {
 };
 
 const pristine = new Pristine(adForm, defaultConfig, true);
+
+const adFormRoomNumber = adForm.querySelector('#room_number');
+const adFormCapacity = adForm.querySelector('#capacity');
+const adFormType = adForm.querySelector('#type');
 const adFormTitle = adForm.querySelector('#title');
+const adFormPrice = adForm.querySelector('#price');
+
+const onTypeChange = () => {
+  pristine.validate (adFormPrice);
+  pristine.validate(adFormType);
+};
+
+const onPriceChange = () => {
+  pristine.validate (adFormPrice);
+  pristine.validate(adFormType);
+};
+
+const onCapacityChange = () => {
+  pristine.validate(adFormCapacity);
+  pristine.validate(adFormRoomNumber);
+};
+
+const onRoomNumberChange = () => {
+  pristine.validate(adFormCapacity);
+  pristine.validate(adFormRoomNumber);
+};
+
+adFormPrice.addEventListener('input', onTypeChange);
+adFormType.addEventListener('change', onPriceChange);
+adFormCapacity.addEventListener('change', onCapacityChange);
+adFormRoomNumber.addEventListener('change', onRoomNumberChange);
+
 const validateIsNotEmpty = (value) => value;
+pristine.addValidator(adFormTitle, validateIsNotEmpty, 'Поле обязательно для заполнения');
 const validateTitleLength = (value) => value.length >= 30 && value.length <= 100;
 pristine.addValidator(adFormTitle, validateTitleLength, 'От 30 до 100 символов');
-pristine.addValidator(adFormTitle, validateIsNotEmpty, 'Поле обязательно для заполнения');
-const adFormPrice = adForm.querySelector('#price');
-const validatePriceIsZero = (value) => value !== '0';
-const validatePriceIsLessThenZero = (value) => value >= 0;
-const validatePriceMax = (value) => value <= 100000;
 pristine.addValidator(adFormPrice, validateIsNotEmpty, 'Поле обязательно для заполнения');
+const validatePriceIsZero = (value) => value !== '0';
 pristine.addValidator(adFormPrice, validatePriceIsZero, 'Бесплатный сыр только в мышеловке');
+const validatePriceIsLessThenZero = (value) => value >= 0;
 pristine.addValidator(adFormPrice, validatePriceIsLessThenZero, 'Вы не можете доплачивать постояльцам');
+const validatePriceMax = (value) => value <= 100000;
 pristine.addValidator(adFormPrice, validatePriceMax, 'Цена не может быть больше 100000');
-
-const roomsToGuests = {
-  1: ['1'],
-  2: ['1', '2'],
-  3: ['1', '2', '3'],
-  100: ['0']
-};
 
 const typeToMinPrice = {
   bungalow: 0,
@@ -39,31 +59,27 @@ const typeToMinPrice = {
   palace: 10000,
 };
 
-const adFormType = adForm.querySelector('#type');
+const typeToPricePlaceholder = () => {
+  adFormPrice.placeholder = typeToMinPrice[adFormType.value];
+  return true;
+};
 
-// const adFormCapacity = adForm.querySelector('#capacity');
+pristine.addValidator(adFormPrice, typeToPricePlaceholder, 'this');
 
-// const roomNumber = adForm.querySelector('#room_number');
+const validateTypeToMinPrice = (value) => value >= typeToMinPrice[adFormType.value];
 
-// const validateTypeToPrice = function() {
-//   if (adFormPrice.value >= typeToMinPrice[adFormType.value]) {
-//     console.log(true);
-//     return true;
-//   } else {
-//     console.log(false);
-//     return false;
-//   }
-// };
+pristine.addValidator(adFormPrice, validateTypeToMinPrice, 'Слишком маленькая цена');
 
-// pristine.addValidator(adFormPrice, validateTypeToPrice, `Минимальная цена ${typeToMinPrice[adFormType.value]} рублей`);
+const roomsToGuests = {
+  1: ['1'],
+  2: ['1', '2'],
+  3: ['1', '2', '3'],
+  100: ['0']
+};
 
-// console.log(typesEngToRus[adFormType.value]);
+const validateCapacity = () => roomsToGuests[adFormRoomNumber.value].includes(adFormCapacity.value);
 
-const consoleLogFunction = () => console.log(typesEngToRus[adFormType.value]);
-
-pristine.addValidator(adFormType, consoleLogFunction, typesEngToRus[adFormType.value]);
-
-// pristine.addValidator(adFormType, validateCapacity, 'test');
+pristine.addValidator(adFormCapacity, validateCapacity, 'Недопустимое количество комнат');
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
