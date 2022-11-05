@@ -66,4 +66,4 @@ const generateCard = ({ author, offer }) => {
   canvasElement.appendChild(cardElement);
 };
 
-generateCard(offers[randomNumber(0, offers.length - 1)]);
+// generateCard(offers[randomNumber(0, offers.length - 1)]);
