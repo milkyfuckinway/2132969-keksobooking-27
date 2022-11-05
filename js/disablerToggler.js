@@ -7,11 +7,10 @@ const disableFunction = () => {
   });
 };
 
-const disablerToggler = () => {
+export const disablerToggler = () => {
   adForm.classList.toggle('ad-form--disabled');
   mapFilter.classList.toggle('map__filters--disabled');
   disableFunction();
 };
 
-disablerToggler();
 disablerToggler();

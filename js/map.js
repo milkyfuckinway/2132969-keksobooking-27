@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
+import {disablerToggler} from './disablerToggler.js';
+
 const map = L.map('map-canvas')
   .on('load', () => {
     console.log('Карта инициализирована');
+    disablerToggler();
   })
   .setView({
-    lat:  48.703827,
+    lat: 48.703827,
     lng: 44.510325,
   }, 15);
 
@@ -24,7 +27,7 @@ const mainPinIcon = L.icon({
 
 const marker = L.marker(
   {
-    lat:  48.703827,
+    lat: 48.703827,
     lng: 44.510325,
   },
   {
@@ -33,8 +36,10 @@ const marker = L.marker(
   },
 );
 
+const adFormAddress = document.querySelector('#address');
+
 marker.on('moveend', (evt) => {
-  console.log(evt.target.getLatLng());
+  adFormAddress.value = evt.target.getLatLng();
 });
 
 marker.addTo(map);
