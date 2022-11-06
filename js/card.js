@@ -1,11 +1,8 @@
 import {
   createRandomArray
 } from './data.js';
-import { randomNumber } from './math.js';
-
 
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
-const canvasElement = document.querySelector('#map-canvas');
 
 const typesEngToRus = {
   flat: 'Квартира',
@@ -63,10 +60,8 @@ const generateCard = ({ author, offer }) => {
     userPhotoList.classList.add('visually-hidden');
   }
   cardElement.querySelector('.popup__avatar').src = author.avatar;
-  canvasElement.appendChild(cardElement);
+  return cardElement;
 };
 
-// generateCard(offers[randomNumber(0, offers.length - 1)]);
-
-export {generateCard};
-export {offers};
+export { generateCard };
+export { offers };

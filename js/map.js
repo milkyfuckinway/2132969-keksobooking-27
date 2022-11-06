@@ -2,10 +2,9 @@
 import { disablerToggler } from './disablerToggler.js';
 import { offers } from './card.js';
 import { generateCard } from './card.js';
-import { createRandomArray } from './data.js';
 
-const LAT = 35.67347;
-const LNG = 139.75863;
+const LAT = 35.67500;
+const LNG = 139.75000;
 const adFormAddress = document.querySelector('#address');
 
 const mainPinIcon = L.icon({
@@ -56,10 +55,9 @@ const createAdPinMarkers = (offersList) => {
     },
     {
       icon: additionalPinIcon,
-      draggable: true,
     },
     );
-    additionalMarker.addTo(map).bindPopup('test');
+    additionalMarker.addTo(map).bindPopup(generateCard(itemOfList));
   });
 };
 
