@@ -1,5 +1,24 @@
 /* eslint-disable no-console */
-import {disablerToggler} from './disablerToggler.js';
+import { disablerToggler } from './disablerToggler.js';
+import { offers } from './card.js';
+import { generateCard } from './card.js';
+import { createRandomArray } from './data.js';
+
+const LAT = 35.67347;
+const LNG = 139.75863;
+const adFormAddress = document.querySelector('#address');
+
+const mainPinIcon = L.icon({
+  iconUrl: './img/main-pin.svg',
+  iconSize: [52, 52],
+  iconAnchor: [26, 52],
+});
+
+const additionalPinIcon = L.icon({
+  iconUrl: './img/pin.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
 
 const map = L.map('map-canvas')
   .on('load', () => {
@@ -7,9 +26,9 @@ const map = L.map('map-canvas')
     disablerToggler();
   })
   .setView({
-    lat: 48.703827,
-    lng: 44.510325,
-  }, 15);
+    lat: LAT,
+    lng: LNG,
+  }, 13);
 
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -18,17 +37,10 @@ L.tileLayer(
   },
 ).addTo(map);
 
-const mainPinIcon = L.icon({
-  iconUrl: './img/main-pin.svg',
-  iconSize: [52, 52],
-  iconAnchor: [26, 52],
-});
-
-
 const marker = L.marker(
   {
-    lat: 48.703827,
-    lng: 44.510325,
+    lat: LAT,
+    lng: LNG,
   },
   {
     draggable: true,
@@ -36,10 +48,30 @@ const marker = L.marker(
   },
 );
 
-const adFormAddress = document.querySelector('#address');
+const createAdPinMarkers = (offersList) => {
+  offersList.forEach((itemOfList) => {
+    const additionalMarker = L.marker({
+      lat: itemOfList.location.lat,
+      lng: itemOfList.location.lng,
+    },
+    {
+      icon: additionalPinIcon,
+      draggable: true,
+    },
+    );
+    additionalMarker.addTo(map).bindPopup('test');
+  });
+};
+
+createAdPinMarkers(offers);
 
 marker.on('moveend', (evt) => {
-  adFormAddress.value = evt.target.getLatLng();
+  adFormAddress.value = `${evt.target.getLatLng().lat.toFixed(5)} ${evt.target.getLatLng().lng.toFixed(5)}`;
+
+  map.setView({
+    lat: evt.target.getLatLng().lat,
+    lng: evt.target.getLatLng().lng,
+  });
 });
 
 marker.addTo(map);

@@ -7,7 +7,7 @@ import { randomNumber } from './math.js';
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 const canvasElement = document.querySelector('#map-canvas');
 
-export const typesEngToRus = {
+const typesEngToRus = {
   flat: 'Квартира',
   bungalow: 'Бунгало',
   house: 'Дом',
@@ -67,3 +67,6 @@ const generateCard = ({ author, offer }) => {
 };
 
 // generateCard(offers[randomNumber(0, offers.length - 1)]);
+
+export {generateCard};
+export {offers};
