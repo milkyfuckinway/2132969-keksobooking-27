@@ -117,10 +117,11 @@ adFormType.addEventListener('change', () => {
     },
   });
   if (adFormPrice.value) {
-    adFormPrice.value = '';
     sliderElement.noUiSlider.updateOptions({
       start: typeToMinPrice[adFormType.value]
     });
+    adFormPrice.placeholder = typeToMinPrice[adFormType.value];
+    adFormPrice.value = '';
   }
 });
 
