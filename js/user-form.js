@@ -115,10 +115,12 @@ adFormType.addEventListener('change', () => {
       min: typeToMinPrice[adFormType.value],
       max: 100000,
     },
-    start: typeToMinPrice[adFormType.value]
   });
   if (adFormPrice.value) {
     adFormPrice.value = '';
+    sliderElement.noUiSlider.updateOptions({
+      start: typeToMinPrice[adFormType.value]
+    });
   }
 });
 
