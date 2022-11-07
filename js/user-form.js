@@ -15,6 +15,7 @@ const adFormTitle = adForm.querySelector('#title');
 const adFormPrice = adForm.querySelector('#price');
 const adFormTimeIn = adForm.querySelector('#timein');
 const adFormTimeOut = adForm.querySelector('#timeout');
+const sliderElement = document.querySelector('.ad-form__slider');
 
 const typeToMinPrice = {
   bungalow: 0,
@@ -58,8 +59,6 @@ pristine.addValidator(adFormTitle, validateIsNotEmpty, 'Поле обязате�
 const validateTitleLength = (value) => value.length >= 30 && value.length <= 100;
 pristine.addValidator(adFormTitle, validateTitleLength, 'От 30 до 100 символов');
 pristine.addValidator(adFormPrice, validateIsNotEmpty, 'Поле обязательно для заполнения');
-const validatePriceIsZero = (value) => value !== '0';
-pristine.addValidator(adFormPrice, validatePriceIsZero, 'Бесплатный сыр только в мышеловке');
 const validatePriceIsLessThenZero = (value) => value >= 0;
 pristine.addValidator(adFormPrice, validatePriceIsLessThenZero, 'Вы не можете доплачивать постояльцам');
 const validatePriceMax = (value) => value <= 100000;
@@ -92,6 +91,48 @@ const timeInEqualsTimeOut = () => { adFormTimeOut.value = adFormTimeIn.value; };
 adFormTimeOut.addEventListener('change', timeOutEqualsTimeIn);
 adFormTimeIn.addEventListener('change', timeInEqualsTimeOut);
 
+noUiSlider.create(sliderElement, {
+  range: {
+    min: 1000,
+    max: 100000,
+  },
+  start: 1000,
+  step: 1,
+  connect: 'lower',
+  format: {
+    to: function (value) {
+      return value.toFixed(0);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  }
+});
+
+adFormType.addEventListener('change', () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: typeToMinPrice[adFormType.value],
+      max: 100000,
+    },
+    start: typeToMinPrice[adFormType.value]
+  });
+  if (adFormPrice.value) {
+    adFormPrice.value = '';
+  }
+});
+
+sliderElement.noUiSlider.on('update', () => {
+  adFormPrice.value = sliderElement.noUiSlider.get();
+  pristine.validate(adFormPrice);
+});
+
+adFormPrice.addEventListener('change', () => {
+  sliderElement.noUiSlider.set(adFormPrice.value);
+});
+
+adFormPrice.value = '';
+
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
   const isValid = pristine.validate();
@@ -101,3 +142,8 @@ adForm.addEventListener('submit', (evt) => {
     console.log('not valid');
   }
 });
+
+adForm.addEventListener('reset', () => {
+  adFormPrice.placeholder = 1000;
+});
+

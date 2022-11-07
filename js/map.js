@@ -6,18 +6,7 @@ import { generateCard } from './card.js';
 const LAT = 35.67500;
 const LNG = 139.75000;
 const adFormAddress = document.querySelector('#address');
-
-const mainPinIcon = L.icon({
-  iconUrl: './img/main-pin.svg',
-  iconSize: [52, 52],
-  iconAnchor: [26, 52],
-});
-
-const additionalPinIcon = L.icon({
-  iconUrl: './img/pin.svg',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
+const resetButton = document.querySelector('.ad-form__reset');
 
 const map = L.map('map-canvas')
   .on('load', () => {
@@ -36,7 +25,19 @@ L.tileLayer(
   },
 ).addTo(map);
 
-const marker = L.marker(
+const mainPinIcon = L.icon({
+  iconUrl: './img/main-pin.svg',
+  iconSize: [52, 52],
+  iconAnchor: [26, 52],
+});
+
+const additionalPinIcon = L.icon({
+  iconUrl: './img/pin.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
+
+const mainMarker = L.marker(
   {
     lat: LAT,
     lng: LNG,
@@ -46,6 +47,8 @@ const marker = L.marker(
     icon: mainPinIcon,
   },
 );
+
+const markerGroup = L.layerGroup().addTo(map);
 
 const createAdPinMarkers = (offersList) => {
   offersList.forEach((itemOfList) => {
@@ -57,19 +60,29 @@ const createAdPinMarkers = (offersList) => {
       icon: additionalPinIcon,
     },
     );
-    additionalMarker.addTo(map).bindPopup(generateCard(itemOfList));
+    additionalMarker.addTo(markerGroup).bindPopup(generateCard(itemOfList));
   });
 };
 
 createAdPinMarkers(offers);
 
-marker.on('moveend', (evt) => {
+mainMarker.on('moveend', (evt) => {
   adFormAddress.value = `${evt.target.getLatLng().lat.toFixed(5)} ${evt.target.getLatLng().lng.toFixed(5)}`;
-
   map.setView({
     lat: evt.target.getLatLng().lat,
     lng: evt.target.getLatLng().lng,
   });
 });
 
-marker.addTo(map);
+mainMarker.addTo(map);
+
+resetButton.addEventListener('click', () => {
+  mainMarker.setLatLng({
+    lat: LAT,
+    lng: LNG,
+  });
+  map.setView({
+    lat: LAT,
+    lng: LNG,
+  }, 13);
+});
