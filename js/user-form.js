@@ -6,6 +6,8 @@ const defaultConfig = {
   errorTextParent: 'ad-form__element',
 };
 
+const MINPRICE = 1000;
+const MAXPRICE = 100000;
 const pristine = new Pristine(adForm, defaultConfig, true);
 
 const adFormRoomNumber = adForm.querySelector('#room_number');
@@ -93,10 +95,10 @@ adFormTimeIn.addEventListener('change', timeInEqualsTimeOut);
 
 noUiSlider.create(sliderElement, {
   range: {
-    min: 1000,
-    max: 100000,
+    min: MINPRICE,
+    max: MAXPRICE,
   },
-  start: 1000,
+  start: MINPRICE,
   step: 1,
   connect: 'lower',
   format: {
@@ -113,7 +115,7 @@ adFormType.addEventListener('change', () => {
   sliderElement.noUiSlider.updateOptions({
     range: {
       min: typeToMinPrice[adFormType.value],
-      max: 100000,
+      max: MAXPRICE,
     },
   });
   if (adFormPrice.value) {
@@ -147,6 +149,6 @@ adForm.addEventListener('submit', (evt) => {
 });
 
 adForm.addEventListener('reset', () => {
-  adFormPrice.placeholder = 1000;
+  adFormPrice.placeholder = MINPRICE;
 });
 

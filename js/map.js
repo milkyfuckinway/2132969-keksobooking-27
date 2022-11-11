@@ -1,23 +1,16 @@
 /* eslint-disable no-console */
 import { disablerToggler } from './disablerToggler.js';
-import { offers } from './card.js';
 import { generateCard } from './card.js';
+import { sendRequest } from './fetch.js';
 
 const LAT = 35.67500;
 const LNG = 139.75000;
+const MAX_OFFERS = 10;
 const adFormAddress = document.querySelector('#address');
 const resetButton = document.querySelector('.ad-form__reset');
+let adverts = [];
 
-const map = L.map('map-canvas')
-  .on('load', () => {
-    console.log('Карта инициализирована');
-    disablerToggler();
-  })
-  .setView({
-    lat: LAT,
-    lng: LNG,
-  }, 13);
-
+const map = L.map('map-canvas');
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
@@ -60,11 +53,9 @@ const createAdPinMarkers = (offersList) => {
       icon: additionalPinIcon,
     },
     );
-    additionalMarker.addTo(markerGroup).bindPopup(generateCard(itemOfList));
+    additionalMarker.addTo(markerGroup).bindPopup (generateCard(itemOfList));
   });
 };
-
-createAdPinMarkers(offers);
 
 mainMarker.on('moveend', (evt) => {
   adFormAddress.value = `${evt.target.getLatLng().lat.toFixed(5)} ${evt.target.getLatLng().lng.toFixed(5)}`;
@@ -86,3 +77,22 @@ resetButton.addEventListener('click', () => {
     lng: LNG,
   }, 13);
 });
+
+const onSuccess = (data) => {
+  adverts = data.slice(0, MAX_OFFERS);
+  createAdPinMarkers(adverts);
+};
+
+const onError = () => {
+  console.log('Ошибка api fetch');
+};
+
+map.on('load', () => {
+  console.log('Карта инициализирована');
+  disablerToggler();
+  sendRequest(onSuccess, onError, 'GET');
+})
+  .setView({
+    lat: LAT,
+    lng: LNG,
+  }, 13);
