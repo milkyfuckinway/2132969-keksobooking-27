@@ -1,22 +1,21 @@
 const Urls = {
-  GET: 'https://25.javascript.pages.academy/keksobooking/data',
-  POST: 'https://25.javascript.pages.academy/keksobooking',
+  GET: 'https://27.javascript.pages.academy/keksobooking/data',
+  POST: 'https://27.javascript.pages.academy/keksobookingg',
 };
 
-const sendRequest = (onSuccess, onError, method, data) => {
+const sendRequest = (onSuccess, onError, method, body) => {
   fetch(
     Urls[method],
     {
       method: method,
-      body: data,
+      body: body,
     },
   )
     .then((response) => response.json())
-    .then((body) => {
-      onSuccess(body);
+    .then((data) => {
+      onSuccess(data);
     }).catch((error) => {
       onError(error);
-      console.log(error);
     });
 };
 
