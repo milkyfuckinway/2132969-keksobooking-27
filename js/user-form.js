@@ -1,5 +1,5 @@
 import { sendRequest } from './fetch.js';
-import { resetAddress, resetMapPosition} from './map.js';
+import { resetAddress, resetMapPosition } from './map.js';
 
 const adForm = document.querySelector('.ad-form');
 const submitButton = document.querySelector('.ad-form__submit');
@@ -158,6 +158,11 @@ const sendingFormErrorMessage = () => {
   });
   document.body.addEventListener('click', () => {
     errorContainer.remove();
+  });
+  document.addEventListener('keydown', ({ key }) => {
+    if (key === 'Escape') {
+      errorContainer.remove();
+    }
   });
   document.body.appendChild(errorContainer);
 };
