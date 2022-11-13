@@ -1,23 +1,19 @@
-/* eslint-disable no-console */
 import { disablerToggler } from './disablerToggler.js';
-import { offers } from './card.js';
 import { generateCard } from './card.js';
+import { sendRequest } from './fetch.js';
 
 const LAT = 35.67500;
 const LNG = 139.75000;
+const MAX_OFFERS = 10;
 const adFormAddress = document.querySelector('#address');
-const resetButton = document.querySelector('.ad-form__reset');
+const mapCanvas = document.querySelector('.map__canvas');
+const resetAddress = () => {
+  adFormAddress.value = `${LAT.toFixed(5)} ${LNG.toFixed(5)}`;
+};
 
-const map = L.map('map-canvas')
-  .on('load', () => {
-    console.log('Карта инициализирована');
-    disablerToggler();
-  })
-  .setView({
-    lat: LAT,
-    lng: LNG,
-  }, 13);
+let adverts = [];
 
+const map = L.map('map-canvas');
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
@@ -64,8 +60,6 @@ const createAdPinMarkers = (offersList) => {
   });
 };
 
-createAdPinMarkers(offers);
-
 mainMarker.on('moveend', (evt) => {
   adFormAddress.value = `${evt.target.getLatLng().lat.toFixed(5)} ${evt.target.getLatLng().lng.toFixed(5)}`;
   map.setView({
@@ -76,7 +70,7 @@ mainMarker.on('moveend', (evt) => {
 
 mainMarker.addTo(map);
 
-resetButton.addEventListener('click', () => {
+const resetMapPosition = () => {
   mainMarker.setLatLng({
     lat: LAT,
     lng: LNG,
@@ -85,4 +79,44 @@ resetButton.addEventListener('click', () => {
     lat: LAT,
     lng: LNG,
   }, 13);
-});
+  map.closePopup();
+};
+
+const onSuccess = (data) => {
+  adverts = data.slice(0, MAX_OFFERS);
+  createAdPinMarkers(adverts);
+  resetAddress();
+  disablerToggler();
+};
+
+const showNoConnetcionErrorMessage = () => {
+  const noConnetcionErrorMessage = document.createElement('div');
+  noConnetcionErrorMessage.style.zIndex = '400';
+  noConnetcionErrorMessage.style.position = 'absolute';
+  noConnetcionErrorMessage.style.left = '0';
+  noConnetcionErrorMessage.style.top = '0';
+  noConnetcionErrorMessage.style.right = '0';
+  noConnetcionErrorMessage.style.fontSize = '20px';
+  noConnetcionErrorMessage.style.height = 'max-content';
+  noConnetcionErrorMessage.style.color = '#ffffff';
+  noConnetcionErrorMessage.style.textTransform = 'uppercase';
+  noConnetcionErrorMessage.style.textAlign = 'center';
+  noConnetcionErrorMessage.style.backgroundColor = '#DC343B';
+  noConnetcionErrorMessage.textContent = 'Не удалось установить соединение с сервером';
+  mapCanvas.append(noConnetcionErrorMessage);
+};
+
+const onError = () => {
+  showNoConnetcionErrorMessage();
+};
+
+map.on('load', () => {
+  sendRequest(onSuccess, onError, 'GET');
+  resetAddress();
+})
+  .setView({
+    lat: LAT,
+    lng: LNG,
+  }, 13);
+
+export { resetAddress, resetMapPosition };

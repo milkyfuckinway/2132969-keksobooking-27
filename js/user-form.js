@@ -1,10 +1,20 @@
-/* eslint-disable no-console */
+import { sendRequest } from './fetch.js';
+import { resetAddress, resetMapPosition } from './map.js';
+
 const adForm = document.querySelector('.ad-form');
+const submitButton = document.querySelector('.ad-form__submit');
+
 const defaultConfig = {
   classTo: 'ad-form__element',
   errorClass: 'ad-form__element--invalid',
   errorTextParent: 'ad-form__element',
 };
+
+const MINPRICE = 1000;
+const MAXPRICE = 100000;
+const TIMEOUT_SUCCESS_MESSAGE = 2000;
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
 const pristine = new Pristine(adForm, defaultConfig, true);
 
@@ -93,10 +103,10 @@ adFormTimeIn.addEventListener('change', timeInEqualsTimeOut);
 
 noUiSlider.create(sliderElement, {
   range: {
-    min: 1000,
-    max: 100000,
+    min: MINPRICE,
+    max: MAXPRICE,
   },
-  start: 1000,
+  start: MINPRICE,
   step: 1,
   connect: 'lower',
   format: {
@@ -113,7 +123,7 @@ adFormType.addEventListener('change', () => {
   sliderElement.noUiSlider.updateOptions({
     range: {
       min: typeToMinPrice[adFormType.value],
-      max: 100000,
+      max: MAXPRICE,
     },
   });
   if (adFormPrice.value) {
@@ -136,17 +146,65 @@ adFormPrice.addEventListener('change', () => {
 
 adFormPrice.value = '';
 
+const disableSubmitButton = (evtTarget) => {
+  evtTarget.disabled = !evtTarget.disabled;
+};
+
+const sendingFormErrorMessage = () => {
+  const errorContainer = errorTemplate.cloneNode('true');
+  const errorButton = errorContainer.querySelector('.error__button');
+  errorButton.addEventListener('click', () => {
+    errorContainer.remove();
+  });
+  document.body.addEventListener('click', () => {
+    errorContainer.remove();
+  });
+  document.addEventListener('keydown', ({ key }) => {
+    if (key === 'Escape') {
+      errorContainer.remove();
+    }
+  });
+  document.body.appendChild(errorContainer);
+};
+
+const sendingFormSuccessMessage = () => {
+  const successContainer = successTemplate.cloneNode('true');
+  document.body.appendChild(successContainer);
+  setTimeout(() => {
+    successContainer.remove();
+  }, TIMEOUT_SUCCESS_MESSAGE);
+};
+
+const onSuccess = () => {
+  disableSubmitButton(submitButton);
+  adForm.reset();
+  resetAddress();
+  sendingFormSuccessMessage();
+};
+
+const onError = () => {
+  sendingFormErrorMessage();
+  disableSubmitButton(submitButton);
+};
+
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
+  disableSubmitButton(submitButton);
   const isValid = pristine.validate();
   if (isValid) {
-    console.log('valid');
+    const formData = new FormData(adForm);
+    sendRequest(onSuccess, onError, 'POST', formData);
   } else {
-    console.log('not valid');
+    disableSubmitButton(submitButton);
   }
 });
 
 adForm.addEventListener('reset', () => {
-  adFormPrice.placeholder = 1000;
+  adFormPrice.placeholder = MINPRICE;
+  sliderElement.noUiSlider.reset();
+  resetMapPosition();
+  resetAddress();
+  pristine.reset();
 });
+
 

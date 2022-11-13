@@ -1,7 +1,3 @@
-import {
-  createRandomArray
-} from './data.js';
-
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const typesEngToRus = {
@@ -12,7 +8,6 @@ const typesEngToRus = {
   hotel: 'Отель'
 };
 
-const offers = createRandomArray();
 const generateCard = ({ author, offer }) => {
   const cardElement = cardTemplate.cloneNode(true);
   const popupTitle = cardElement.querySelector('.popup__title');
@@ -35,8 +30,8 @@ const generateCard = ({ author, offer }) => {
   for (let i = 0; i < featuresLength; i++) {
     popupFeaturesList.removeChild(cardElement.querySelector('.popup__feature'));
   }
-  if (offer.features.length === 0) {
-    popupFeaturesList.classList.add('visually-hidden');
+  if (!offer.features || offer.features.length === 0) {
+    popupFeaturesList.remove();
   } else {
     for (let i = 0; i < offer.features.length; i++) {
       const feature = document.createElement('li');
@@ -47,21 +42,20 @@ const generateCard = ({ author, offer }) => {
   if (offer.description !== undefined) {
     popupDescription.textContent = offer.description;
   } else {
-    popupDescription.classList.add('visually-hidden');
+    popupDescription.remove();
   }
   cardElement.querySelector('.popup__photos').removeChild(userPhoto);
-  if (offer.photos.length !== 0) {
+  if (offer.photos && offer.photos.length !== 0) {
     for (let i = 0; i < offer.photos.length; i++) {
       const userPhotoCloned = userPhoto.cloneNode(true);
       userPhotoCloned.src = offer.photos[i];
       userPhotoList.appendChild(userPhotoCloned);
     }
   } else {
-    userPhotoList.classList.add('visually-hidden');
+    userPhotoList.remove();
   }
   cardElement.querySelector('.popup__avatar').src = author.avatar;
   return cardElement;
 };
 
 export { generateCard };
-export { offers };
