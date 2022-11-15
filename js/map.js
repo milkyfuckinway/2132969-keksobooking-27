@@ -1,17 +1,20 @@
-import { disablerToggler } from './disablerToggler.js';
-import { generateCard } from './card.js';
+import { changeFormState } from './form-state.js';
+import { generatePopup } from './popup.js';
 import { sendRequest } from './fetch.js';
+import { filterData, MAX_OFFERS } from './filter.js';
+import { debounce } from './utils.js';
 
 const LAT = 35.67500;
 const LNG = 139.75000;
-const MAX_OFFERS = 10;
+const ZOOM = 13;
+const DEBOUNCE_TIMEOUT_DELAY = 500;
 const adFormAddress = document.querySelector('#address');
 const mapCanvas = document.querySelector('.map__canvas');
+const filteringList = document.querySelector('.map__filters');
+
 const resetAddress = () => {
   adFormAddress.value = `${LAT.toFixed(5)} ${LNG.toFixed(5)}`;
 };
-
-let adverts = [];
 
 const map = L.map('map-canvas');
 L.tileLayer(
@@ -56,7 +59,7 @@ const createAdPinMarkers = (offersList) => {
       icon: additionalPinIcon,
     },
     );
-    additionalMarker.addTo(markerGroup).bindPopup(generateCard(itemOfList));
+    additionalMarker.addTo(markerGroup).bindPopup(generatePopup(itemOfList));
   });
 };
 
@@ -78,15 +81,28 @@ const resetMapPosition = () => {
   map.setView({
     lat: LAT,
     lng: LNG,
-  }, 13);
+  }, ZOOM);
   map.closePopup();
 };
 
+let adverts = [];
+
+const clearSecondaryPins = () => {
+  markerGroup.clearLayers();
+};
+
+const onMapFiltersChange = debounce(() => {
+  clearSecondaryPins();
+  createAdPinMarkers(filterData(adverts));
+}, DEBOUNCE_TIMEOUT_DELAY);
+
+const generateDefaultMarkers = () => createAdPinMarkers(adverts.slice(0, MAX_OFFERS));
+
 const onSuccess = (data) => {
-  adverts = data.slice(0, MAX_OFFERS);
-  createAdPinMarkers(adverts);
-  resetAddress();
-  disablerToggler();
+  adverts = data.slice();
+  generateDefaultMarkers();
+  changeFormState();
+  filteringList.addEventListener('change', onMapFiltersChange);
 };
 
 const showNoConnetcionErrorMessage = () => {
@@ -117,6 +133,6 @@ map.on('load', () => {
   .setView({
     lat: LAT,
     lng: LNG,
-  }, 13);
+  }, ZOOM);
 
-export { resetAddress, resetMapPosition };
+export { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins };

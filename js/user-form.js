@@ -1,23 +1,18 @@
 import { sendRequest } from './fetch.js';
-import { resetAddress, resetMapPosition } from './map.js';
-
-const adForm = document.querySelector('.ad-form');
-const submitButton = document.querySelector('.ad-form__submit');
-
-const defaultConfig = {
-  classTo: 'ad-form__element',
-  errorClass: 'ad-form__element--invalid',
-  errorTextParent: 'ad-form__element',
-};
+import { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins } from './map.js';
+import { mapFiltersContainer } from './filter.js';
 
 const MINPRICE = 1000;
 const MAXPRICE = 100000;
 const TIMEOUT_SUCCESS_MESSAGE = 2000;
+const TITLE_MIN_LENGTH = 30;
+const TITLE_MAX_LENGTH = 100;
+const PRICE_MIN_VALUE = 0;
+const PRICE_MAX_VALUE = 100000;
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
-
-const pristine = new Pristine(adForm, defaultConfig, true);
-
+const adForm = document.querySelector('.ad-form');
+const submitButton = adForm.querySelector('.ad-form__submit');
 const adFormRoomNumber = adForm.querySelector('#room_number');
 const adFormCapacity = adForm.querySelector('#capacity');
 const adFormType = adForm.querySelector('#type');
@@ -27,6 +22,13 @@ const adFormTimeIn = adForm.querySelector('#timein');
 const adFormTimeOut = adForm.querySelector('#timeout');
 const sliderElement = document.querySelector('.ad-form__slider');
 
+const defaultConfig = {
+  classTo: 'ad-form__element',
+  errorClass: 'ad-form__element--invalid',
+  errorTextParent: 'ad-form__element',
+};
+
+const pristine = new Pristine(adForm, defaultConfig, true);
 const typeToMinPrice = {
   bungalow: 0,
   flat: 1000,
@@ -66,13 +68,13 @@ adFormRoomNumber.addEventListener('change', onRoomNumberChange);
 
 const validateIsNotEmpty = (value) => value;
 pristine.addValidator(adFormTitle, validateIsNotEmpty, 'Поле обязательно для заполнения');
-const validateTitleLength = (value) => value.length >= 30 && value.length <= 100;
-pristine.addValidator(adFormTitle, validateTitleLength, 'От 30 до 100 символов');
+const validateTitleLength = (value) => value.length >= TITLE_MIN_LENGTH && value.length <= TITLE_MAX_LENGTH;
+pristine.addValidator(adFormTitle, validateTitleLength, `От ${TITLE_MIN_LENGTH} до ${TITLE_MAX_LENGTH} символов`);
 pristine.addValidator(adFormPrice, validateIsNotEmpty, 'Поле обязательно для заполнения');
-const validatePriceIsLessThenZero = (value) => value >= 0;
+const validatePriceIsLessThenZero = (value) => value >= PRICE_MIN_VALUE;
 pristine.addValidator(adFormPrice, validatePriceIsLessThenZero, 'Вы не можете доплачивать постояльцам');
-const validatePriceMax = (value) => value <= 100000;
-pristine.addValidator(adFormPrice, validatePriceMax, 'Цена не может быть больше 100000');
+const validatePriceMax = (value) => value <= PRICE_MAX_VALUE;
+pristine.addValidator(adFormPrice, validatePriceMax, `Цена не может быть больше ${PRICE_MAX_VALUE}`);
 
 const validateTypeToMinPrice = () => {
   if (!adFormPrice.value) {
@@ -146,8 +148,8 @@ adFormPrice.addEventListener('change', () => {
 
 adFormPrice.value = '';
 
-const disableSubmitButton = (evtTarget) => {
-  evtTarget.disabled = !evtTarget.disabled;
+const changeSubmitButtonState = () => {
+  submitButton.disabled = !submitButton.disabled;
 };
 
 const sendingFormErrorMessage = () => {
@@ -175,27 +177,32 @@ const sendingFormSuccessMessage = () => {
   }, TIMEOUT_SUCCESS_MESSAGE);
 };
 
+const resetFiltersToDefault = () => {
+  mapFiltersContainer.reset();
+};
+
 const onSuccess = () => {
-  disableSubmitButton(submitButton);
+  changeSubmitButtonState();
   adForm.reset();
   resetAddress();
   sendingFormSuccessMessage();
+  resetFiltersToDefault();
 };
 
 const onError = () => {
   sendingFormErrorMessage();
-  disableSubmitButton(submitButton);
+  changeSubmitButtonState();
 };
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  disableSubmitButton(submitButton);
+  changeSubmitButtonState();
   const isValid = pristine.validate();
   if (isValid) {
     const formData = new FormData(adForm);
     sendRequest(onSuccess, onError, 'POST', formData);
   } else {
-    disableSubmitButton(submitButton);
+    changeSubmitButtonState();
   }
 });
 
@@ -205,6 +212,9 @@ adForm.addEventListener('reset', () => {
   resetMapPosition();
   resetAddress();
   pristine.reset();
+  resetFiltersToDefault();
+  clearSecondaryPins();
+  generateDefaultMarkers();
 });
 
 
