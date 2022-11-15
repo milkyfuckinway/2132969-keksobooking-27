@@ -1,17 +1,17 @@
-import { disablerToggler } from './disablerToggler.js';
-import { generateCard } from './card.js';
+import { changeFormState } from './form-state.js';
+import { generatePopup } from './popup.js';
 import { sendRequest } from './fetch.js';
+import { filterData, MAX_OFFERS } from './filter.js';
 
 const LAT = 35.67500;
 const LNG = 139.75000;
-const MAX_OFFERS = 10;
 const adFormAddress = document.querySelector('#address');
 const mapCanvas = document.querySelector('.map__canvas');
+const filteringList = document.querySelector('.map__filters');
+
 const resetAddress = () => {
   adFormAddress.value = `${LAT.toFixed(5)} ${LNG.toFixed(5)}`;
 };
-
-let adverts = [];
 
 const map = L.map('map-canvas');
 L.tileLayer(
@@ -56,7 +56,7 @@ const createAdPinMarkers = (offersList) => {
       icon: additionalPinIcon,
     },
     );
-    additionalMarker.addTo(markerGroup).bindPopup(generateCard(itemOfList));
+    additionalMarker.addTo(markerGroup).bindPopup(generatePopup(itemOfList));
   });
 };
 
@@ -82,11 +82,23 @@ const resetMapPosition = () => {
   map.closePopup();
 };
 
+let adverts = [];
+
+const removeMapPin = () => {
+  markerGroup.clearLayers();
+};
+
+const onMapFiltersChange = () => {
+  removeMapPin();
+  createAdPinMarkers(filterData(adverts));
+};
+
+
 const onSuccess = (data) => {
-  adverts = data.slice(0, MAX_OFFERS);
-  createAdPinMarkers(adverts);
-  resetAddress();
-  disablerToggler();
+  adverts = data.slice();
+  createAdPinMarkers(adverts.slice(0, MAX_OFFERS));
+  changeFormState();
+  filteringList.addEventListener('change', onMapFiltersChange);
 };
 
 const showNoConnetcionErrorMessage = () => {
