@@ -2,9 +2,12 @@ import { changeFormState } from './form-state.js';
 import { generatePopup } from './popup.js';
 import { sendRequest } from './fetch.js';
 import { filterData, MAX_OFFERS } from './filter.js';
+import { debounce } from './utils.js';
 
 const LAT = 35.67500;
 const LNG = 139.75000;
+const ZOOM = 13;
+const DEBOUNCE_TIMEOUT_DELAY = 500;
 const adFormAddress = document.querySelector('#address');
 const mapCanvas = document.querySelector('.map__canvas');
 const filteringList = document.querySelector('.map__filters');
@@ -78,25 +81,26 @@ const resetMapPosition = () => {
   map.setView({
     lat: LAT,
     lng: LNG,
-  }, 13);
+  }, ZOOM);
   map.closePopup();
 };
 
 let adverts = [];
 
-const removeMapPin = () => {
+const clearSecondaryPins = () => {
   markerGroup.clearLayers();
 };
 
-const onMapFiltersChange = () => {
-  removeMapPin();
+const onMapFiltersChange = debounce(() => {
+  clearSecondaryPins();
   createAdPinMarkers(filterData(adverts));
-};
+}, DEBOUNCE_TIMEOUT_DELAY);
 
+const generateDefaultMarkers = () => createAdPinMarkers(adverts.slice(0, MAX_OFFERS));
 
 const onSuccess = (data) => {
   adverts = data.slice();
-  createAdPinMarkers(adverts.slice(0, MAX_OFFERS));
+  generateDefaultMarkers();
   changeFormState();
   filteringList.addEventListener('change', onMapFiltersChange);
 };
@@ -129,6 +133,6 @@ map.on('load', () => {
   .setView({
     lat: LAT,
     lng: LNG,
-  }, 13);
+  }, ZOOM);
 
-export { resetAddress, resetMapPosition };
+export { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins };

@@ -1,5 +1,5 @@
 import { sendRequest } from './fetch.js';
-import { resetAddress, resetMapPosition } from './map.js';
+import { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins } from './map.js';
 import { mapFiltersContainer } from './filter.js';
 
 const MINPRICE = 1000;
@@ -213,6 +213,8 @@ adForm.addEventListener('reset', () => {
   resetAddress();
   pristine.reset();
   resetFiltersToDefault();
+  clearSecondaryPins();
+  generateDefaultMarkers();
 });
 
 
