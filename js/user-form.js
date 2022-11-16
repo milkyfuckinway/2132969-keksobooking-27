@@ -1,6 +1,7 @@
 import { sendRequest } from './fetch.js';
 import { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins } from './map.js';
 import { mapFiltersContainer } from './filter.js';
+import { resetPreviews } from './upload-images.js';
 
 const MINPRICE = 1000;
 const MAXPRICE = 100000;
@@ -97,11 +98,11 @@ const validateCapacity = () => roomsToGuests[adFormRoomNumber.value].includes(ad
 
 pristine.addValidator(adFormCapacity, validateCapacity, 'Недопустимое количество комнат');
 
-const timeOutEqualsTimeIn = () => { adFormTimeIn.value = adFormTimeOut.value; };
-const timeInEqualsTimeOut = () => { adFormTimeOut.value = adFormTimeIn.value; };
+const onTimeOutChange = () => { adFormTimeIn.value = adFormTimeOut.value; };
+const onTimeInChange = () => { adFormTimeOut.value = adFormTimeIn.value; };
 
-adFormTimeOut.addEventListener('change', timeOutEqualsTimeIn);
-adFormTimeIn.addEventListener('change', timeInEqualsTimeOut);
+adFormTimeOut.addEventListener('change', onTimeOutChange);
+adFormTimeIn.addEventListener('change', onTimeInChange);
 
 noUiSlider.create(sliderElement, {
   range: {
@@ -215,6 +216,7 @@ adForm.addEventListener('reset', () => {
   resetFiltersToDefault();
   clearSecondaryPins();
   generateDefaultMarkers();
+  resetPreviews();
 });
 
 
