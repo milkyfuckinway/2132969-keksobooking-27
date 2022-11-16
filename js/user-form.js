@@ -1,6 +1,7 @@
 import { sendRequest } from './fetch.js';
 import { resetAddress, resetMapPosition, generateDefaultMarkers, clearSecondaryPins } from './map.js';
 import { mapFiltersContainer } from './filter.js';
+import { resetPreviews } from './upload-images.js';
 
 const MINPRICE = 1000;
 const MAXPRICE = 100000;
@@ -215,6 +216,7 @@ adForm.addEventListener('reset', () => {
   resetFiltersToDefault();
   clearSecondaryPins();
   generateDefaultMarkers();
+  resetPreviews();
 });
 
 
