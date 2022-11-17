@@ -95,26 +95,21 @@ const onMapFiltersChange = debounce(() => {
 
 const generateDefaultMarkers = () => {createAdPinMarkers(adverts.slice(0, MAX_OFFERS));console.log('Отрисовка стандартных маркеров')};
 
-const onSuccesfulData = () => {
-  generateDefaultMarkers();
-  changeFormState();
-};
+// const onSuccess = (data) => {
+//   adverts = data.slice();
+//   generateDefaultMarkers();
+//   changeFormState();
+//   filteringList.addEventListener('change', onMapFiltersChange);
+// };
 
 const onSuccess = (data) => {
   adverts = data.slice();
-  onSuccesfulData();
   filteringList.addEventListener('change', onMapFiltersChange);
+  const loadingMap = new Promise((resolve) => {
+    resolve(generateDefaultMarkers());
+  });
+  loadingMap.then(changeFormState());
 };
-
-// const onSuccess = (data) => {
-//   adverts = data.slice();
-//   filteringList.addEventListener('change', onMapFiltersChange);
-//   const loadingMap = new Promise((resolve) => {
-//     generateDefaultMarkers();
-//     resolve();
-//   });
-//   loadingMap.then(changeFormState());
-// };
 
 const showNoConnetcionErrorMessage = () => {
   const noConnetcionErrorMessage = document.createElement('div');
