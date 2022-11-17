@@ -12,7 +12,6 @@ const changeFormState = () => {
   adForm.classList.toggle('ad-form--disabled');
   mapFilter.classList.toggle('map__filters--disabled');
   disableForm();
-  console.log('Изменени состояния формы');
 };
 
 export { changeFormState };

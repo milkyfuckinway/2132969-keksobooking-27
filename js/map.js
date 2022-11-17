@@ -93,22 +93,13 @@ const onMapFiltersChange = debounce(() => {
   createAdPinMarkers(filterData(adverts));
 }, DEBOUNCE_TIMEOUT_DELAY);
 
-const generateDefaultMarkers = () => {createAdPinMarkers(adverts.slice(0, MAX_OFFERS));console.log('Отрисовка стандартных маркеров')};
-
-// const onSuccess = (data) => {
-//   adverts = data.slice();
-//   generateDefaultMarkers();
-//   changeFormState();
-//   filteringList.addEventListener('change', onMapFiltersChange);
-// };
+const generateDefaultMarkers = () => createAdPinMarkers(adverts.slice(0, MAX_OFFERS));
 
 const onSuccess = (data) => {
   adverts = data.slice();
+  generateDefaultMarkers();
+  changeFormState();
   filteringList.addEventListener('change', onMapFiltersChange);
-  const loadingMap = new Promise((resolve) => {
-    resolve(generateDefaultMarkers());
-  });
-  loadingMap.then(changeFormState());
 };
 
 const showNoConnetcionErrorMessage = () => {
